@@ -13,11 +13,19 @@ namespace TCPIPLib
         private static TcpListener _tcpListener;
         private readonly List<ClientObject> _clients = new();
 
+        /// <summary>
+        ///     Add new connection
+        /// </summary>
+        /// <param name="clientObject">Client to work with</param>
         public void AddConnection(ClientObject clientObject)
         {
             _clients.Add(clientObject);
         }
 
+        /// <summary>
+        ///     Delete client from connection
+        /// </summary>
+        /// <param name="id">Client ID</param>
         public void RemoveConnection(string id)
         {
             var client = _clients.FirstOrDefault(c => c.Id == id);
@@ -25,6 +33,9 @@ namespace TCPIPLib
                 _clients.Remove(client);
         }
 
+        /// <summary>
+        ///     Server listener which checks if someone send message
+        /// </summary>
         public void Listen()
         {
             try
@@ -49,18 +60,31 @@ namespace TCPIPLib
             }
         }
 
+        /// <summary>
+        ///     Broadcast message to all clients excluding sender
+        /// </summary>
+        /// <param name="message">Message to send</param>
+        /// <param name="id">Id of sender to exclude it from broadcast</param>
         public void BroadcastMessage(string message, string id)
         {
             var data = Encoding.Unicode.GetBytes(message);
             foreach (var t in _clients.Where(t => t.Id != id))
-                 t.Stream.Write(data, 0, data.Length);
-        }
-        public void BroadcastMessageToServer(string message, string id)
-        {
-            var data = Encoding.Unicode.GetBytes(message);
-                //Save confident data
+                t.Stream.Write(data, 0, data.Length);
         }
 
+        //public void BroadcastMessageToServer(string message, string id)
+        //{
+        //    //var data = Encoding.Unicode.GetBytes(message);
+        //    if (message.Length < 6)
+        //        throw new ArgumentException("Password is too week, minimum 6 characters needed");
+
+        //    Console.WriteLine(message);
+        //        //Save confident data
+        //}
+
+        /// <summary>
+        ///     Close connection for each client end stop server
+        /// </summary>
         public void Disconnect()
         {
             _tcpListener.Stop();

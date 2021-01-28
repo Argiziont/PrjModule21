@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -9,14 +10,20 @@ namespace ClientEntity
     {
         private const string Host = "127.0.0.1";
         private const int Port = 8888;
+
         private static string _userName;
+
+        // private static string _userPassword;
         private static TcpClient _client;
         private static NetworkStream _stream;
 
         private static void Main()
         {
+            Console.WriteLine("File transfer chat");
+
             Console.Write("Enter your name: ");
             _userName = Console.ReadLine();
+
             _client = new TcpClient();
             try
             {
@@ -45,11 +52,13 @@ namespace ClientEntity
 
         private static void SendMessage()
         {
-            Console.WriteLine("Enter message: ");
+            Console.WriteLine("Enter File path: ");
 
             while (true)
             {
-                var message = Console.ReadLine();
+                var file = Console.ReadLine();
+                if (!File.Exists(file)) continue;
+                var message = File.ReadAllText(file);
                 var data = Encoding.Unicode.GetBytes(message ?? throw new InvalidOperationException());
                 _stream.Write(data, 0, data.Length);
             }
@@ -77,6 +86,7 @@ namespace ClientEntity
                     Console.ReadLine();
                     Disconnect();
                 }
+
             // ReSharper disable once FunctionNeverReturns
         }
 

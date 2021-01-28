@@ -11,6 +11,7 @@ namespace TCPIPLib
 
         private string _userName;
 
+        //private string _userPassword;
         public ClientObject(TcpClient tcpClient, ServerObject serverObject)
         {
             Id = Guid.NewGuid().ToString();
@@ -22,6 +23,9 @@ namespace TCPIPLib
         protected internal string Id { get; }
         protected internal NetworkStream Stream { get; private set; }
 
+        /// <summary>
+        ///     Main client function, sends message to other clients and prints broadcasted messages
+        /// </summary>
         public void Process()
         {
             try
@@ -29,9 +33,11 @@ namespace TCPIPLib
                 Stream = _client.GetStream();
                 var message = GetMessage();
                 _userName = message;
+                //_userPassword = message.Split(' ')[1];
 
-                message = _userName + " Entered the chat with ID:"+ Id;
+                message = _userName + " Entered the chat with ID:" + Id;
                 _server.BroadcastMessage(message, Id);
+                //_server.BroadcastMessageToServer(_userPassword, Id);
                 Console.WriteLine(message);
                 while (true)
                     try
@@ -60,6 +66,10 @@ namespace TCPIPLib
             }
         }
 
+        /// <summary>
+        ///     Gets message from network stream
+        /// </summary>
+        /// <returns>String representation of byte array</returns>
         private string GetMessage()
         {
             var data = new byte[64];
@@ -73,6 +83,9 @@ namespace TCPIPLib
             return builder.ToString();
         }
 
+        /// <summary>
+        ///     Close connection for this client
+        /// </summary>
         protected internal void Close()
         {
             Stream?.Close();
